@@ -39,11 +39,11 @@
     }
 
     tr:nth-child(even) {
-        background-color: #dddddd;
+        background-color: #33ccff;
     }
 
     tr:hover {
-        background-color: gray;
+        background-color: #0067a5;
         color: white;
     }
 
@@ -60,6 +60,64 @@
       overflow: auto;
     }
 
+
+    .dropzone {
+        width: 300px;
+        height: 100px;
+        border: 2px dashed gray;
+        color: gray;
+        line-height: 250px;
+        margin: 10px auto;
+        text-align: center;
+        position: relative;
+
+    }
+
+    .dropzone.dragover {
+        border-color: #000;
+        color: #000;
+        text-align: center;
+    }
+
+
+    .tooltip {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black;
+}
+
+  .tooltip .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -60px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .tooltip .tooltiptext::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #555 transparent transparent transparent;
+  }
+
+  .tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+  }
 </style>
 
 
@@ -124,7 +182,7 @@
 
         for(let road of roadData)
         {
-            let dataString = '<tr><td><a href="A7S.html ">'
+            let dataString = '<tr> <td><a href="A7S.html ">'
             dataString += road.IMG
             dataString += '</td><td>'
             dataString += road.Name
@@ -141,7 +199,7 @@
             dataString += '</td><td>'
             dataString += road.RoadType
             dataString += '</td><td>'
-            dataString += '<a href="https://ll-srv-web.livinglab.local:3000/Sebastian.Keidler/CRO_data/src/branch/master/data/cro/A7.N.L0.R1.ASCII.cro">link'
+            dataString += '<a href="https://ll-srv-web.livinglab.local:3000/Sebastian.Keidler/CRO_data/src/branch/master/data/cro/A7.N.L0.R1.ASCII.cro">download'
             dataString += '</td></tr>'
 
 
@@ -150,9 +208,6 @@
 
         tableBody.innerHTML = dataHtml;
     }
-
-
-
 
 /* function zum spalten sortieren */
 
@@ -179,13 +234,77 @@
 
     }
 
+    // Handle drag and drop into a dropzone_element div:
+    // send the files as a POST request to the server
+    "use strict";
+
+    // Only start once the DOM tree is ready
+    if(document.readyState === "complete") {
+        createDropzoneMethods();
+    } else {
+        document.addEventListener("DOMContentLoaded", createDropzoneMethods);
+    }
+
+    function createDropzoneMethods() {
+        let dropzone = document.getElementById("dropzone_element");
+
+        dropzone.ondragover = function() {
+            this.className = "dropzone dragover";
+            return false;
+        }
+
+        dropzone.ondragleave = function() {
+            this.className = "dropzone";
+            return false;
+        }
+
+        dropzone.ondrop = function(e) {
+            // Stop browser from simply opening that was just dropped
+            e.preventDefault();
+            // Restore original dropzone appearance
+            this.className = "dropzone";
+
+            upload_files(e.dataTransfer.files)
+        }
+    }
+
+    function upload_files(files) {
+        let upload_results = document.getElementById("upload_results_element");
+        let formData = new FormData(),
+            xhr = new XMLHttpRequest();
+
+        console.log("Dropped " + String(files.length) + " files.");
+        for(let i=0; i<files.length; i++) {
+            formData.append("file", files[i]);
+        }
+
+        xhr.onreadystatechange = function() {
+            if(xhr.readyState === XMLHttpRequest.DONE) {
+                alert(xhr.responseText);
+            }
+
+            console.log(xhr.response);
+            upload_results.innerHTML = this.response;
+        }
+
+        console.log("Let's upload files: ", formData);
+        xhr.open('POST', 'upload_handler.py', true); // async = true
+        xhr.send(formData);
+    }
 
 </script>
 
 
 
 
-<body style="background-color:rgb(100, 200, 360);">
+<body style="background-color:rgb(255, 255, 255);">
+<br>
+  <div id="dropzone_element" class="dropzone"  >
+      Drop CRO files here to upload
+  </div>
+
+  <div id="upload_results_element" align="right" >
+  </div>
 
   <table align="center">
 
@@ -205,6 +324,8 @@
           <th>CRO data link</th>
 
       </tr>
+
+
 
       </thead>
 
