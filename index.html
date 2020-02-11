@@ -1,0 +1,220 @@
+<html>
+
+
+
+<head>
+
+
+  <img src="img/adrive.png" align='left'></img>
+
+  <img src="img/hsk.png" align='right'></img>
+
+  <br>
+
+  <title>Ground Truth Map Manager</title>
+
+  <h1 align='center'>Ground Truth Map Manager</h1>
+
+  <h2 align='center'>total length: 140,2 km</h2>
+
+  <br>
+
+
+
+<style>/* CSS Befehle für die optische Darstellung     */
+
+    table {
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+    }
+
+/* Tabelle Gitter     */
+    td, th {
+        border: 2px solid black;
+        padding: 15px;
+    }
+
+    th {
+        font-weight: bold;
+    }
+
+    tr:nth-child(even) {
+        background-color: #dddddd;
+    }
+
+    tr:hover {
+        background-color: gray;
+        color: white;
+    }
+
+
+    tbody {
+        height: 200px;       /* Just for the demo          */
+        overflow-y: auto;    /* Trigger vertical scroll    */
+        overflow-x: hidden;  /* Hide the horizontal scroll */
+    }
+
+
+    .scroll {
+      max-height: 60px;
+      overflow: auto;
+    }
+
+</style>
+
+
+<script>/* java script programm function */
+
+/* Variable erstellen */
+    let sortDirection = false;
+/* Variable erstellen */
+    let roadData = [
+      { Name: 'A7', Length: 28.3 , Direction: 'north',Start: 'Dietmannsried',
+      End: 'Nesselwang',Region: 'Kempten',RoadType: 'motorway',
+      IMG: '<img src="img/A7.png" alt="" border=3 height=100 width=100> </img>'},
+
+        { Name: 'A7', Length: 28.3 , Direction: 'south',Start: 'Nesselwang',
+        End: 'Dietmannsried',Region: 'Kempten',RoadType: 'motorway',
+        IMG: '<img src="img/A7.png" alt="" border=3 height=100 width=100></img>'},
+
+        { Name: 'A8', Length: 28.4, Direction: 'west', Start: 'Leonberg',
+        End: 'Pforzheim',Region: 'Stuttgart',RoadType: 'motorway',
+        IMG: '<img src="img/A8.png" alt="" border=3 height=100 width=100></img>' },
+
+        { Name: 'B19', Length: 14.8, Direction: 'south', Start: 'Waltenhofen',
+        End: 'Immenstadt' ,Region: 'Kempten',RoadType: 'federal road',
+        IMG: '<img src="img/B19.png" alt="" border=3 height=100 width=100></img>'},
+
+        { Name: 'B308', Length: 5.3, Direction: 'west', Start: 'Immenstadt',
+        End: 'Baerenfalle' ,Region: 'Kempten',RoadType: 'federal road',
+        IMG: '<img src="img/B308.png" alt="" border=3 height=100 width=100></img>'},
+
+        { Name: 'B308', Length: 5.3, Direction: 'east', Start: 'Baerenfalle',
+        End: 'Immenstadt' ,Region: 'Kempten',RoadType: 'federal road',
+        IMG: '<img src="img/B308.png" alt="" border=3 height=100 width=100></img>'},
+
+        { Name: 'B295', Length: 18.5, Direction: 'west', Start: 'Renningen',
+         End: 'Calw' ,Region: 'Stuttgart',RoadType: 'federal road',
+         IMG: '<img src="img/B295.png" alt="" border=3 height=100 width=100></img>'},
+
+        { Name: 'L1180', Length: 5.2,  Direction: 'north', Start: 'Malmsheim',
+        End: 'Perouse',Region: 'Stuttgart',RoadType: 'cross road',
+        IMG: '<img src="img/L1180.png" alt="" border=3 height=100 width=100></img>' },
+
+        { Name: 'L1180', Length: 5.2,  Direction: 'south', Start: 'Perouse',
+        End: 'Malmsheim' ,Region: 'Stuttgart',RoadType: 'cross road',
+        IMG: '<img src="img/L1180.png" alt="" border=3 height=100 width=100></img>'},
+
+        { Name: 'Memmingen', Region: 'Kempten',Length: 0.9, Direction: 'west',Start: '',
+         End: '' ,Region: 'Kempten',RoadType: 'test track',
+         IMG: '<img src="img/MM.png" alt="" border=3 height=100 width=100></img>'}
+    ];
+
+
+/* funktionsaufruf */
+    window.onload = () => {
+        loadTableData(roadData);
+    };
+
+
+/* function zum Erstellen der Tabelle */
+    function loadTableData(roadData) {
+        const tableBody = document.getElementById('roadData');
+        let dataHtml = '';
+
+        for(let road of roadData)
+        {
+            let dataString = '<tr><td><a href="A7S.html ">'
+            dataString += road.IMG
+            dataString += '</td><td>'
+            dataString += road.Name
+            dataString += '</td><td>'
+            dataString += road.Length
+            dataString += '</td><td>'
+            dataString += road.Direction
+            dataString += '</td><td>'
+            dataString += road.End
+            dataString += '</td><td>'
+            dataString += road.Start
+            dataString += '</td><td>'
+            dataString += road.Region
+            dataString += '</td><td>'
+            dataString += road.RoadType
+            dataString += '</td><td>'
+            dataString += '<a href="https://ll-srv-web.livinglab.local:3000/Sebastian.Keidler/CRO_data/src/branch/master/data/cro/A7.N.L0.R1.ASCII.cro">link'
+            dataString += '</td></tr>'
+
+
+            dataHtml += dataString;
+        };
+
+        tableBody.innerHTML = dataHtml;
+    }
+
+
+
+
+/* function zum spalten sortieren */
+
+    function sortColumn(columnName) {
+        const dataType = typeof roadData[0][columnName];
+        sortDirection = !sortDirection;
+
+        switch(dataType) {
+          case 'number':
+          sortNumberColumn(sortDirection, columnName);
+          break;
+        }
+        loadTableData(roadData);
+
+
+    }
+
+/* function sortieren von Zahlenwerten */
+    function sortNumberColumn(sort, columnName) {
+        roadData = roadData.sort((p1,p2) => {
+          return sort ? p1[columnName] - p2[columnName] : p2[columnName] -
+          p1[columnName]
+        });
+
+    }
+
+
+</script>
+
+
+
+
+<body style="background-color:rgb(100, 200, 360);">
+
+  <table align="center">
+
+    <div class="scroll" style="height:100px;overflow:auto;">
+
+      <thead>
+
+      <tr>
+          <th> Preview  </th>
+          <th> Name  </th>
+          <th onclick="sortColumn('Length')">Length   </th>
+          <th>Direction</th>
+          <th>Start</th>
+          <th>End</th>
+          <th>Region</th>
+          <th>Road Type</th>
+          <th>CRO data link</th>
+
+      </tr>
+
+      </thead>
+
+      <tbody style="width:100%" id="roadData">
+      </tbody>
+
+
+  </table>
+
+</body>
+
+
+</html>
